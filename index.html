@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FormCap — Choice Limiter, Form Limiter &amp; Live Sheet Sync for Google Forms™</title>
+    <meta
+      name="description"
+      content="Minimalist Google Forms add-on: cap individual choices, schedule auto-open/close & response limits, and sync options live from Google Sheets. Free tier + $5/mo Pro."
+    />
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/icon-32.png" />
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --ink: #0f172a;
+        --muted: #475569;
+        --border: #e2e8f0;
+        --brand: #6d28d9;
+        --brand-dark: #4c1d95;
+        --brand-soft: #f5f3ff;
+        --emerald: #059669;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.6;
+      }
+      nav {
+        background: #ffffff;
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 20;
+      }
+      .nav-inner {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 14px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        font-size: 18px;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .brand img {
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+      }
+      .nav-links {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        font-size: 14px;
+      }
+      .nav-links a {
+        color: var(--muted);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .nav-links a:hover {
+        color: var(--brand);
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 14px;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+      }
+      .btn-primary {
+        background: var(--brand);
+        color: #ffffff;
+      }
+      .btn-primary:hover {
+        background: var(--brand-dark);
+      }
+      .btn-outline {
+        background: #ffffff;
+        color: var(--ink);
+        border: 1px solid var(--border);
+      }
+      .btn-outline:hover {
+        background: #f1f5f9;
+      }
+      .container {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+      .checkout-banner {
+        display: none;
+        margin: 24px auto 0;
+        max-width: 780px;
+        background: #ecfdf5;
+        border: 1px solid #6ee7b7;
+        border-radius: 12px;
+        padding: 20px 24px;
+      }
+      .checkout-banner.visible {
+        display: block;
+      }
+      .key-box {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+      .key-code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 18px;
+        font-weight: 800;
+        background: #ffffff;
+        border: 1px solid #a7f3d0;
+        padding: 8px 14px;
+        border-radius: 8px;
+        color: #065f46;
+      }
+      .hero {
+        padding: 64px 0 48px;
+        text-align: center;
+      }
+      .pill {
+        display: inline-block;
+        background: var(--brand-soft);
+        color: var(--brand);
+        border: 1px solid #ddd6fe;
+        border-radius: 999px;
+        padding: 4px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 16px;
+      }
+      .hero h1 {
+        font-size: clamp(30px, 4.5vw, 46px);
+        line-height: 1.12;
+        letter-spacing: -0.025em;
+        margin: 0 auto 16px;
+        max-width: 760px;
+      }
+      .hero p {
+        font-size: 17px;
+        color: var(--muted);
+        max-width: 640px;
+        margin: 0 auto 28px;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .hero-preview {
+        margin: 40px auto 0;
+        max-width: 920px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+        background: #ffffff;
+      }
+      .hero-preview img {
+        width: 100%;
+        display: block;
+      }
+      section {
+        padding: 48px 0;
+      }
+      h2 {
+        font-size: 26px;
+        letter-spacing: -0.02em;
+        margin: 0 0 12px;
+        text-align: center;
+      }
+      .section-sub {
+        text-align: center;
+        color: var(--muted);
+        max-width: 600px;
+        margin: 0 auto 32px;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+        gap: 20px;
+      }
+      .card {
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+      }
+      .card h3 {
+        margin: 0 0 8px;
+        font-size: 17px;
+      }
+      .card p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .tag {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--brand);
+        margin-bottom: 8px;
+      }
+      .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+        gap: 20px;
+        max-width: 720px;
+        margin: 0 auto;
+      }
+      .price-card {
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 28px;
+      }
+      .price-card.featured {
+        border: 2px solid var(--brand);
+        box-shadow: 0 12px 30px rgba(109, 40, 217, 0.1);
+      }
+      .price {
+        font-size: 34px;
+        font-weight: 800;
+        margin: 10px 0 4px;
+      }
+      .price span {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      ul.checklist {
+        list-style: none;
+        padding: 0;
+        margin: 18px 0 24px;
+      }
+      ul.checklist li {
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: #334155;
+      }
+      .trust-box {
+        background: var(--brand-soft);
+        border: 1px solid #ddd6fe;
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 820px;
+        margin: 0 auto;
+        font-size: 14px;
+      }
+      .faq-list {
+        max-width: 780px;
+        margin: 0 auto;
+        display: grid;
+        gap: 14px;
+      }
+      .faq-item {
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 18px 20px;
+      }
+      .faq-item strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .faq-item p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+      footer {
+        border-top: 1px solid var(--border);
+        background: #ffffff;
+        padding: 28px 24px;
+        margin-top: 40px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .footer-inner {
+        max-width: 1040px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      footer a {
+        color: var(--muted);
+        text-decoration: none;
+        margin-left: 16px;
+      }
+      footer a:hover {
+        color: var(--brand);
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="nav-inner">
+        <a class="brand" href="./index.html">
+          <img src="./assets/icon-128.png" alt="FormCap icon" />
+          <span>FormCap</span>
+        </a>
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#privacy">Privacy</a>
+          <a href="./privacy.html">Privacy Policy</a>
+          <a href="./terms.html">Terms</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <!-- Shown automatically when redirected back from Stripe Checkout -->
+      <div id="checkout-banner" class="checkout-banner" role="status">
+        <strong style="font-size: 16px; color: #065f46">Welcome to FormCap Pro!</strong>
+        <p id="checkout-status" style="margin: 6px 0 0; font-size: 14px; color: #065f46">
+          Fetching your Pro license key…
+        </p>
+        <div id="checkout-key-wrap" class="key-box" style="display: none">
+          <code id="checkout-key" class="key-code"></code>
+          <button id="copy-key-btn" type="button" class="btn btn-primary">Copy Key</button>
+        </div>
+        <p style="margin: 12px 0 0; font-size: 13px; color: #047857">
+          Open <strong>FormCap</strong> in Google Forms → click <strong>Pro ($5/mo)</strong> → paste your key and click
+          <strong>Unlock</strong>.
+        </p>
+      </div>
+
+      <section class="hero">
+        <div class="pill">Google Forms™ Editor Add-on · Built for Reliability</div>
+        <h1>Choice Limiter, Form Limiter &amp; Live Sheet Sync — in one clean sidebar.</h1>
+        <p>
+          Stop double-booked time slots, silent sync failures, and surprise submission cutoffs. FormCap runs
+          deterministically inside Google Apps Script with zero bloated menus and transparent $5/mo Pro pricing.
+        </p>
+        <div class="hero-actions">
+          <a href="#pricing" class="btn btn-primary">View Free &amp; Pro ($5/mo)</a>
+          <a href="./privacy.html" class="btn btn-outline">Read Privacy &amp; Scopes</a>
+        </div>
+        <div class="hero-preview">
+          <img
+            src="./assets/preview.png"
+            alt="FormCap 300px Google Forms sidebar managing choice limits, response schedules, and Sheet sync"
+          />
+        </div>
+      </section>
+
+      <section id="features">
+        <h2>Three core tools. Zero silent breakages.</h2>
+        <p class="section-sub">
+          Engineered around immutable Google Form Item IDs, Apps Script locks, and built-in trigger health checks.
+        </p>
+        <div class="grid-3">
+          <div class="card">
+            <div class="tag">Tool 1 · Choices</div>
+            <h3>Per-Choice Limits &amp; Waitlist</h3>
+            <p>
+              Cap Multiple Choice, Dropdown, and Checkbox options individually or globally. Renaming a question never
+              breaks rules, go-to-section branching stays intact, and concurrent overbooking races are automatically
+              flagged in the sidebar.
+            </p>
+          </div>
+          <div class="card">
+            <div class="tag">Tool 2 · Limits</div>
+            <h3>Response Caps &amp; Schedule Windows</h3>
+            <p>
+              Automatically close your Google Form at a max total response count or exact date/time with a custom closed
+              message — or schedule a full Auto-Open and Auto-Close registration window.
+            </p>
+          </div>
+          <div class="card">
+            <div class="tag">Tool 3 · Sheet Sync</div>
+            <h3>Live Google Sheet → Form Sync</h3>
+            <p>
+              Paste any Google Sheet URL (or 1-click use the form’s linked Sheet) to keep options and per-choice seat
+              caps synchronized — manually, on every submission, or hourly — without ever reopening already-full slots.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing">
+        <h2>Simple, honest pricing</h2>
+        <p class="section-sub">
+          We never silently freeze a live Free form at 20 responses. Limits apply only to advanced automation features.
+        </p>
+        <div class="pricing-grid">
+          <div class="price-card">
+            <div class="tag">Free Forever</div>
+            <div class="price">$0 <span>/ month</span></div>
+            <ul class="checklist">
+              <li>✓ 1 active choice-limited question (unlimited options &amp; responses)</li>
+              <li>✓ Whole-form Max Total Responses or Auto-Close date/time</li>
+              <li>✓ Unlimited Manual Sheet-to-Form syncs</li>
+              <li>✓ Trigger health check &amp; 1-click repair</li>
+              <li>✓ 3 AI Quick Setup &amp; Copy Polish tries</li>
+            </ul>
+            <a href="#faq" class="btn btn-outline" style="width: 100%; text-align: center">Included on Install</a>
+          </div>
+          <div class="price-card featured">
+            <div class="tag">FormCap Pro</div>
+            <div class="price">$5 <span>/ month · cancel anytime</span></div>
+            <ul class="checklist">
+              <li>✓ Unlimited choice-limited questions across unlimited forms</li>
+              <li>✓ Auto Sheet Sync (On Submit &amp; Hourly) + Sheet Cap Column</li>
+              <li>✓ Waitlist fallback &amp; “(N left)” remaining-seat badges</li>
+              <li>✓ Scheduled Auto-Open + Auto-Close windows</li>
+              <li>✓ Unlimited AI Quick Setup &amp; Closed Message polish</li>
+            </ul>
+            <a
+              href="https://buy.stripe.com/9B65kx5s24UP5hg6gV7N601"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-primary"
+              style="width: 100%; text-align: center"
+              >Upgrade to FormCap Pro — $5/mo</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section id="privacy">
+        <div class="trust-box">
+          <strong style="display: block; font-size: 16px; margin-bottom: 6px; color: #4c1d95"
+            >Privacy-First &amp; Google Workspace Limited Use Compliant</strong
+          >
+          <p style="margin: 0">
+            100% of live form submission counts, choice updates, and Sheet syncs run deterministically inside Google
+            Apps Script — <strong>respondent answers and respondent PII never leave Google.</strong> Optional setup-time
+            AI Quick Setup sends only question titles and option labels (never responses) and is never used for AI/ML
+            model training. FormCap uses only 4 narrow Sensitive OAuth scopes (zero Google Drive or Gmail scopes).
+            <a href="./privacy.html" style="color: #6d28d9; font-weight: 700">Read full Privacy Policy →</a>
+          </p>
+        </div>
+      </section>
+
+      <section id="faq">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-list">
+          <div class="faq-item">
+            <strong>Will renaming a Google Form question break my choice limits?</strong>
+            <p>
+              No. FormCap binds every rule to the question’s immutable Google Form Item ID rather than its title text.
+            </p>
+          </div>
+          <div class="faq-item">
+            <strong>Does FormCap preserve Go-to-Section branching?</strong>
+            <p>
+              Yes. Whenever choices are updated, hidden, or annotated with seats-left badges, FormCap preserves each
+              option’s page navigation rule.
+            </p>
+          </div>
+          <div class="faq-item">
+            <strong>What happens if two respondents submit the last spot at the exact same second?</strong>
+            <p>
+              Google Forms does not live-refresh open respondent tabs. FormCap serializes updates using Apps Script
+              locks and immediately flags any millisecond race in the sidebar Overbooking Alert banner so you see it
+              right away.
+            </p>
+          </div>
+          <div class="faq-item">
+            <strong>How do I manage or cancel my Pro subscription?</strong>
+            <p>
+              Click the green <strong>PRO</strong> pill in the FormCap sidebar and choose
+              <strong>Manage Subscription (Stripe Portal)</strong> to cancel or update billing anytime. Need help?
+              Email <a href="mailto:sdai.code@gmail.com">sdai.code@gmail.com</a>.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <div class="footer-inner">
+        <span>© 2026 SDAI Code · FormCap for Google Forms™</span>
+        <div>
+          <a href="./privacy.html">Privacy Policy</a>
+          <a href="./terms.html">Terms of Service</a>
+          <a href="mailto:sdai.code@gmail.com">Support</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        const BACKEND_URL = 'https://formcap-backend-1079052194835.us-central1.run.app';
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('checkout') !== 'success') return;
+
+        const banner = document.getElementById('checkout-banner');
+        const statusEl = document.getElementById('checkout-status');
+        const keyWrap = document.getElementById('checkout-key-wrap');
+        const keyEl = document.getElementById('checkout-key');
+        const copyBtn = document.getElementById('copy-key-btn');
+        if (!banner || !statusEl || !keyWrap || !keyEl || !copyBtn) return;
+
+        banner.classList.add('visible');
+        const sessionId = params.get('session_id');
+        if (!sessionId || !BACKEND_URL.startsWith('http')) {
+          statusEl.textContent =
+            'Your subscription is active! If you need your license key resent, email sdai.code@gmail.com.';
+          return;
+        }
+
+        let attempts = 0;
+        async function pollKey() {
+          attempts += 1;
+          try {
+            const res = await fetch(
+              BACKEND_URL + '/api/billing/checkout-key?session_id=' + encodeURIComponent(sessionId),
+            );
+            if (res.ok) {
+              const data = await res.json();
+              if (data && data.licenseKey) {
+                statusEl.textContent = 'Your FormCap Pro license key is ready:';
+                keyEl.textContent = data.licenseKey;
+                keyWrap.style.display = 'flex';
+                copyBtn.onclick = function () {
+                  navigator.clipboard.writeText(data.licenseKey);
+                  copyBtn.textContent = 'Copied!';
+                  setTimeout(function () {
+                    copyBtn.textContent = 'Copy Key';
+                  }, 2000);
+                };
+                return;
+              }
+            }
+          } catch (_) {
+            // retry below
+          }
+          if (attempts < 10) {
+            setTimeout(pollKey, 1500);
+          } else {
+            statusEl.textContent =
+              'Your payment succeeded! Please refresh this page in a moment or email sdai.code@gmail.com if your key does not appear.';
+          }
+        }
+        pollKey();
+      })();
+    </script>
+  </body>
+</html>
