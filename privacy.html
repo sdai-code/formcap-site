@@ -82,9 +82,9 @@
 
       <h2>1. Data Access — Minimal OAuth Permissions &amp; What Data We Access</h2>
       <p>
-        FormCap is engineered on a least-privilege architecture using only Sensitive (non-Restricted) Google OAuth
-        scopes declared in <code>appsscript.json</code>, plus standard non-sensitive Google Workspace Marketplace
-        identity scopes:
+        FormCap is engineered on a least-privilege architecture using minimal non-Restricted Google OAuth scopes
+        declared in <code>appsscript.json</code>, plus standard non-sensitive Google Workspace Marketplace identity
+        scopes:
       </p>
       <ul>
         <li>
@@ -93,13 +93,14 @@
           a form on your configured schedule or total-response cap (including via background time-driven triggers).
         </li>
         <li>
-          <code>https://www.googleapis.com/auth/spreadsheets.readonly</code> — Allows read-only access to the specific
-          Google Sheet tab and columns you explicitly link in the Sheet Sync tab to populate form choices and optional
-          per-choice capacity numbers. FormCap never writes to or modifies your Google Sheets.
+          <code>https://www.googleapis.com/auth/drive.file</code> — Non-sensitive per-file scope: grants access solely
+          to the individual Google Sheet you explicitly select via the Google Picker dialog in the Sheet Sync tab to
+          read choice options and optional per-choice capacity numbers. FormCap cannot see any other files or
+          spreadsheets in your Google Drive, and never writes to or modifies your Google Sheets.
         </li>
         <li>
           <code>https://www.googleapis.com/auth/script.container.ui</code> — Allows FormCap to render its 300px
-          sidebar interface inside Google Forms via <code>FormApp.getUi().showSidebar()</code>.
+          sidebar interface and Google Picker dialog inside Google Forms.
         </li>
         <li>
           <code>https://www.googleapis.com/auth/script.scriptapp</code> — Allows FormCap to install, inspect, repair,
@@ -123,8 +124,10 @@
           you explicitly link inside FormCap’s Sheet Sync tab.
         </li>
         <li>
-          <strong>APIs Never Accessed:</strong> FormCap never requests or accesses Google Drive, Gmail, Google
-          Calendar, Google Chat, Google Meet, Google Photos, YouTube, or Data Portability APIs.
+          <strong>APIs Never Accessed:</strong> FormCap never requests broad Google Drive access
+          (<code>drive</code> / <code>drive.readonly</code>), broad Google Sheets access
+          (<code>spreadsheets</code> / <code>spreadsheets.readonly</code>), Gmail, Google Calendar, Google Chat, Google
+          Meet, Google Photos, YouTube, or Data Portability APIs.
         </li>
       </ul>
 

@@ -396,8 +396,9 @@
             <div class="tag">Tool 3 · Sheet Sync</div>
             <h3>Live Google Sheet → Form Sync</h3>
             <p>
-              Paste any Google Sheet URL (or 1-click use the form’s linked Sheet) to keep options and per-choice seat
-              caps synchronized — manually, on every submission, or hourly — without ever reopening already-full slots.
+              Select any Google Sheet via Google Picker (or 1-click use the form’s linked Sheet) to keep options and
+              per-choice seat caps synchronized — manually, on every submission, or hourly — without ever reopening
+              already-full slots.
             </p>
           </div>
         </div>
@@ -452,7 +453,8 @@
             100% of live form submission counts, choice updates, and Sheet syncs run deterministically inside Google
             Apps Script — <strong>respondent answers and respondent PII never leave Google.</strong> Optional setup-time
             AI Quick Setup sends only question titles and option labels (never responses) and is never used for AI/ML
-            model training. FormCap uses only 4 narrow Sensitive OAuth scopes (zero Google Drive or Gmail scopes).
+            model training. FormCap uses non-sensitive per-file Google Picker access (<code>drive.file</code>) — never
+            broad Google Drive, broad Google Sheets, or Gmail scopes.
             <a href="./privacy.html" style="color: #6d28d9; font-weight: 700">Read full Privacy Policy →</a>
           </p>
         </div>
